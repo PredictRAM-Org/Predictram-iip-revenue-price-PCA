@@ -92,9 +92,9 @@ selected_stock = st.selectbox("Select Stock", [file.split("/")[-1] for file in s
 industry_data = iip_data[["Date", selected_industry]]
 stock_revenue_data = stock_revenue_data[["Date", "Net Income"]]
 
-# Convert "Date" columns to datetime with error handling
+# Convert "Date" columns to datetime with adjusted format
 try:
-    industry_data["Date"] = pd.to_datetime(industry_data["Date"])
+    industry_data["Date"] = pd.to_datetime(industry_data["Date"], format="%Y:%m (%b)")
     stock_revenue_data["Date"] = pd.to_datetime(stock_revenue_data["Date"])
 except Exception as e:
     st.error(f"Error: {e}")

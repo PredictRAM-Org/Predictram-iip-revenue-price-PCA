@@ -76,119 +76,71 @@ def perform_cross_correlation_analysis(series1, series2):
     return corr_coefficient
 
 # Streamlit app
-st.title("Percentage Change, Correlation, and Trend Analysis")
+st.title("Correlation and Trend Analysis")
 
-# Upload user's stock revenue file
-user_stock_revenue_file = st.file_uploader("Upload your stock revenue file (in Excel format)", type=["xlsx"])
-
-if user_stock_revenue_file is not None:
-    stock_revenue_data = pd.read_excel(user_stock_revenue_file)
-
-# Select industry and stock
-selected_industry = st.selectbox("Select Industry", iip_data.columns[1:])
-selected_stock = st.selectbox("Select Stock", [file.split("/")[-1] for file in stock_files])
-
-# Filter data based on user selection
-industry_data = iip_data[["Date", selected_industry]]
-stock_revenue_data = stock_revenue_data[["Date", "Net Income"]]
-
-# Convert "Date" columns to datetime with adjusted format
-try:
-    industry_data["Date"] = pd.to_datetime(industry_data["Date"], format="%Y:%m (%b)")
-    stock_revenue_data["Date"] = pd.to_datetime(stock_revenue_data["Date"])
-except Exception as e:
-    st.error(f"Error: {e}")
-    st.stop()
-
-# Merge industry growth and stock revenue data on date
-merged_data = pd.merge(industry_data, stock_revenue_data, on="Date", how="inner")
-
-# Calculate percentage change
-percentage_change_data = merged_data.copy()
-percentage_change_data[selected_industry] = percentage_change_data[selected_industry].pct_change() * 100
-percentage_change_data["Net Income"] = percentage_change_data["Net Income"].pct_change() * 100
+# ... (rest of your code)
 
 # Correlation Analysis
-correlation_result = percentage_change_data.corr(method='pearson')
-st.write("## Correlation Analysis Result (Percentage Change)")
+correlation_result = merged_data.corr(method='pearson')
+st.write("## Correlation Analysis Result")
 st.write(correlation_result)
 
 # Time Series Analysis: Autoregressive Integrated Moving Average (ARIMA)
-arima_results = perform_arima_analysis(percentage_change_data[selected_industry].dropna())
-st.write("## ARIMA Analysis Result (Percentage Change)")
+arima_results = perform_arima_analysis(merged_data[selected_industry])
+st.write("## ARIMA Analysis Result")
 st.write(arima_results.summary())
 
 # Exponential Smoothing State Space Models (ETS)
-ets_results = perform_ets_analysis(percentage_change_data[selected_industry].dropna())
-st.write("## ETS Analysis Result (Percentage Change)")
+ets_results = perform_ets_analysis(merged_data[selected_industry])
+st.write("## ETS Analysis Result")
 st.write(ets_results.summary())
 
 # Regression Analysis
-X_reg = percentage_change_data[selected_industry].dropna().values.reshape(-1, 1)
-y_reg = percentage_change_data["Net Income"].dropna().values
+X_reg = merged_data[selected_industry].values.reshape(-1, 1)
+y_reg = merged_data["Net Income"].values
 regression_model = perform_regression_analysis(X_reg, y_reg)
-st.write("## Regression Analysis Result (Percentage Change)")
+st.write("## Regression Analysis Result")
 st.write(f"Regression Coefficient: {regression_model.coef_[0]}")
 st.write(f"Intercept: {regression_model.intercept_}")
 
-# Random Forests
-X_rf = percentage_change_data[selected_industry].dropna().values.reshape(-1, 1)
-y_rf = percentage_change_data["Net Income"].dropna().values
-random_forest_model = perform_random_forest_analysis(X_rf, y_rf)
-st.write("## Random Forest Analysis Result (Percentage Change)")
-st.write(f"Feature Importances: {random_forest_model.feature_importances_}")
-
-# Gradient Boosting
-X_gb = percentage_change_data[selected_industry].dropna().values.reshape(-1, 1)
-y_gb = percentage_change_data["Net Income"].dropna().values
-gradient_boosting_model = perform_gradient_boosting_analysis(X_gb, y_gb)
-st.write("## Gradient Boosting Analysis Result (Percentage Change)")
-st.write(f"Feature Importances: {gradient_boosting_model.feature_importances_}")
-
-# Neural Networks
-X_nn = percentage_change_data[selected_industry].dropna().values.reshape(-1, 1)
-y_nn = percentage_change_data["Net Income"].dropna().values
-neural_networks_model = perform_neural_networks_analysis(X_nn, y_nn)
-st.write("## Neural Networks Analysis Result (Percentage Change)")
-st.write(f"Neural Networks R2 Score: {neural_networks_model.score(X_nn, y_nn)}")
-
-# Principal Component Analysis
-X_pca = percentage_change_data[selected_industry].dropna().values.reshape(-1, 1)
-pca_model = perform_pca_analysis(X_pca)
-st.write("## PCA Analysis Result (Percentage Change)")
-st.write(f"Explained Variance Ratios: {pca_model.explained_variance_ratio_}")
-
-# Cross-Correlation Analysis
-cross_correlation_result = perform_cross_correlation_analysis(percentage_change_data[selected_industry].dropna(), percentage_change_data["Net Income"].dropna())
-st.write("## Cross-Correlation Analysis Result (Percentage Change)")
-st.write(f"Pearson Correlation Coefficient: {cross_correlation_result}")
+# ... (rest of your analysis)
 
 # Display graphs
 st.write("## Graphs")
 
-# Plot industry growth and net income percentage change
-plt.figure(figsize=(10, 6))
-plt.plot(percentage_change_data['Date'], percentage_change_data[selected_industry], label='Industry Growth (%)')
-plt.plot(percentage_change_data['Date'], percentage_change_data['Net Income'], label='Net Income (%)')
-plt.xlabel('Date')
-plt.ylabel('Percentage Change')
-plt.title('Industry Growth vs. Net Income (Percentage Change)')
-plt.legend()
+# Correlation Plot
+plt.figure(figsize=(8, 6))
+plt.title('Correlation Analysis')
+plt.imshow(correlation_result, cmap='coolwarm', interpolation='none', aspect='auto')
+plt.colorbar()
+plt.xticks(range(len(correlation_result.columns)), correlation_result.columns, rotation='vertical')
+plt.yticks(range(len(correlation_result.columns)), correlation_result.columns)
 st.pyplot(plt)
 
-# Plot stock price and net income percentage change
-stock_price_data = load_stock_data(selected_stock)
-stock_price_data["Date"] = pd.to_datetime(stock_price_data["Date"])
-merged_stock_data = pd.merge(stock_price_data, stock_revenue_data, on="Date", how="inner")
-percentage_change_stock_data = merged_stock_data.copy()
-percentage_change_stock_data['Adj Close'] = percentage_change_stock_data['Adj Close'].pct_change() * 100
-percentage_change_stock_data['Net Income'] = percentage_change_stock_data['Net Income'].pct_change() * 100
-
-plt.figure(figsize=(10, 6))
-plt.plot(percentage_change_stock_data['Date'], percentage_change_stock_data['Adj Close'], label='Stock Price (%)')
-plt.plot(percentage_change_stock_data['Date'], percentage_change_stock_data['Net Income'], label='Net Income (%)')
-plt.xlabel('Date')
-plt.ylabel('Percentage Change')
-plt.title('Stock Price vs. Net Income (Percentage Change)')
+# ARIMA Analysis Result graph
+st.write("### ARIMA Analysis Result Graph")
+plt.plot(merged_data['Date'], arima_results.fittedvalues, color='red', label='Fitted values')
+plt.plot(merged_data['Date'], merged_data[selected_industry], label='Actual values')
 plt.legend()
+plt.xlabel('Date')
+plt.ylabel('Values')
+st.pyplot(plt)
+
+# ETS Analysis Result graph
+st.write("### ETS Analysis Result Graph")
+plt.plot(merged_data['Date'], ets_results.fittedvalues, color='red', label='Fitted values')
+plt.plot(merged_data['Date'], merged_data[selected_industry], label='Actual values')
+plt.legend()
+plt.xlabel('Date')
+plt.ylabel('Values')
+st.pyplot(plt)
+
+# ... (continue with other analysis results)
+
+# Cross-Correlation Analysis Result graph
+st.write("### Cross-Correlation Analysis Result Graph")
+plt.scatter(merged_data[selected_industry], merged_data["Net Income"])
+plt.xlabel(selected_industry)
+plt.ylabel("Net Income")
+plt.title("Cross-Correlation Analysis")
 st.pyplot(plt)

@@ -105,6 +105,8 @@ merged_data = pd.merge(industry_data, stock_revenue_data, on="Date", how="inner"
 
 # Correlation Analysis
 correlation_result = merged_data.corr(method='pearson')
+st.write("## Correlation Analysis Result")
+st.write(correlation_result)
 
 # Time Series Analysis: Autoregressive Integrated Moving Average (ARIMA)
 arima_results = perform_arima_analysis(merged_data[selected_industry])
@@ -169,4 +171,16 @@ plt.title('Industry Growth vs. Net Income')
 plt.legend()
 st.pyplot(plt)
 
-# Add other plots for different analyses as needed
+# Plot stock price and revenue
+stock_price_data = load_stock_data(selected_stock)
+stock_price_data["Date"] = pd.to_datetime(stock_price_data["Date"])
+merged_stock_data = pd.merge(stock_price_data, stock_revenue_data, on="Date", how="inner")
+
+plt.figure(figsize=(10, 6))
+plt.plot(merged_stock_data['Date'], merged_stock_data['Adj Close'], label='Stock Price')
+plt.plot(merged_stock_data['Date'], merged_stock_data['Net Income'], label='Net Income')
+plt.xlabel('Date')
+plt.ylabel('Values')
+plt.title('Stock Price vs. Net Income')
+plt.legend()
+st.pyplot(plt)

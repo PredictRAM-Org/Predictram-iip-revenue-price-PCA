@@ -3,4 +3,3 @@ numpy
 statsmodels
 scikit-learn 
 matplotlib==3.5.2
-os

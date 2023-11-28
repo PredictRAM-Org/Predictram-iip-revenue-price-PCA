@@ -3,8 +3,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from statsmodels.tsa.stattools import adfuller
-from statsmodels.tsa.api import VAR
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
@@ -12,7 +10,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import cross_val_score
 from scipy.stats import pearsonr
 
 # Load industry growth data
@@ -110,6 +107,10 @@ selected_stock = st.selectbox("Select Stock", [file.split("/")[-1] for file in s
 # Filter data based on user selection
 industry_data = iip_data[["Date", selected_industry]]
 stock_revenue_data = stock_revenue_data[["Date", "Net Income"]]
+
+# Convert "Date" columns to datetime
+industry_data["Date"] = pd.to_datetime(industry_data["Date"])
+stock_revenue_data["Date"] = pd.to_datetime(stock_revenue_data["Date"])
 
 # Merge industry growth and stock revenue data on date
 merged_data = pd.merge(industry_data, stock_revenue_data, on="Date", how="inner")

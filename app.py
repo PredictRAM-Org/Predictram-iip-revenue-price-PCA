@@ -28,56 +28,42 @@ def load_stock_data(file_path):
 
 # Helper function for ARIMA analysis
 def perform_arima_analysis(data):
-    # Implement ARIMA analysis here
-    # Example: Fit ARIMA model
     model = SARIMAX(data, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12))
     results = model.fit(disp=0)
     return results
 
 # Helper function for ETS analysis
 def perform_ets_analysis(data):
-    # Implement ETS analysis here
-    # Example: Fit ETS model
     model = ExponentialSmoothing(data, seasonal='add', seasonal_periods=12)
     results = model.fit()
     return results
 
 # Helper function for Regression analysis
 def perform_regression_analysis(X, y):
-    # Implement Regression analysis here
-    # Example: Fit Linear Regression model
     model = LinearRegression()
     model.fit(X, y)
     return model
 
 # Helper function for Random Forest analysis
 def perform_random_forest_analysis(X, y):
-    # Implement Random Forest analysis here
-    # Example: Fit Random Forest model
     model = RandomForestRegressor()
     model.fit(X, y)
     return model
 
 # Helper function for Gradient Boosting analysis
 def perform_gradient_boosting_analysis(X, y):
-    # Implement Gradient Boosting analysis here
-    # Example: Fit Gradient Boosting model
     model = GradientBoostingRegressor()
     model.fit(X, y)
     return model
 
 # Helper function for Neural Networks analysis
 def perform_neural_networks_analysis(X, y):
-    # Implement Neural Networks analysis here
-    # Example: Fit Neural Networks model
     model = MLPRegressor()
     model.fit(X, y)
     return model
 
 # Helper function for Principal Component Analysis
 def perform_pca_analysis(X):
-    # Implement PCA analysis here
-    # Example: Fit PCA model
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     pca = PCA()
@@ -86,8 +72,6 @@ def perform_pca_analysis(X):
 
 # Helper function for Cross-Correlation analysis
 def perform_cross_correlation_analysis(series1, series2):
-    # Implement Cross-Correlation analysis here
-    # Example: Calculate Pearson Correlation Coefficient
     corr_coefficient, _ = pearsonr(series1, series2)
     return corr_coefficient
 
